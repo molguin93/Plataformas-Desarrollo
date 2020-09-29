@@ -6,7 +6,7 @@ namespace TP_Parcial
 {
     public class Detalles
     {
-        public string fecha { get; set; }
+        public DateTime fecha { get; set; }
         public int tiempo { get; set; }
         public Recursos recurso { get; set; }
         public Tareas tarea { get; set; }
