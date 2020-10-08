@@ -4,9 +4,10 @@ using System.Text;
 
 namespace TP_Parcial
 {
-    public class Usuarios
+    public class Usuario
     {
-        public string Usuario { get; set; }
+        public int UsuarioPK { get; set; }
+        public string Nombre { get; set; }
         public string Clave { get; set; }
     }
 }

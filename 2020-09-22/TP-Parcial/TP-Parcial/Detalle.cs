@@ -4,11 +4,11 @@ using System.Text;
 
 namespace TP_Parcial
 {
-    public class Detalles
+    public class Detalle
     {
         public DateTime fecha { get; set; }
         public int tiempo { get; set; }
-        public Recursos recurso { get; set; }
-        public Tareas tarea { get; set; }
+        public Recurso recurso { get; set; }
+        public Tarea tarea { get; set; }
     }
 }
