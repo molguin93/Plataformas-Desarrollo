@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,90 +8,46 @@ namespace BlazorApp1.Data
 {
     public class UsuarioService
     {
+        private TareasDbContext ctx;
+
+        public UsuarioService(TareasDbContext _context)
+        {
+            ctx = _context;
+        }
+
         // Metodos de Usuarios (User)
-        public List<Usuario> ListUser()
+        public async Task<List<Usuario>> ListUser()
         {
-            var ctx = new TareasDbContext();
-            var lista = ctx.Usuarios.ToList();
-            return lista;
+            return await ctx.Usuarios.ToListAsync();
         }
 
-        static void SelectUser(int id)
+        public async Task<Usuario> SelectUser(int id)
         {
-            var ctx = new TareasDbContext();
-            var usuario = ctx.Usuarios.Where(i => i.UsuarioPK == id).FirstOrDefault();
+            return await ctx.Usuarios.Where(i => i.UsuarioPK == id).SingleAsync();
+        }
 
-            if (usuario is null)
+        public async Task<Usuario> SaveUser(Usuario value)
+        {
+            if (value.UsuarioPK == 0)
             {
-                Console.WriteLine("El usuario no existe");
+                await ctx.Usuarios.AddAsync(value);
             }
             else
             {
-                Console.WriteLine($"Nombre: {usuario.Nombre} ({usuario.UsuarioPK})");
+                ctx.Usuarios.Update(value);
             }
+            await ctx.SaveChangesAsync();
+            return value;
         }
 
-        static void CreateUser(string name, string pass)
-        {
-            var ctx = new TareasDbContext();
+        public async Task<bool> DeleteUser(int id)
+        {    
+            Usuario user = await ctx.Usuarios.Where(i => i.UsuarioPK == id).SingleAsync();
 
-            ctx.Set<Usuario>().Add(new Usuario
-            {
-                Nombre = name,
-                Clave = pass
-            });
+            ctx.Usuarios.Remove(user);
 
-            ctx.SaveChanges();
-        }
-
-        static void UpdateUser(int id, string name, string pass = null)
-        {
-            var ctx = new TareasDbContext();
-            var usuario = ctx.Usuarios.Where(i => i.UsuarioPK == id).FirstOrDefault();
-
-            if (usuario is null)
-            {
-                Console.WriteLine("El usuario no existe");
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(name))
-                {
-                    usuario.Nombre = name;
-                }
-                if (!string.IsNullOrEmpty(pass))
-                {
-                    usuario.Clave = pass;
-                }
-            }
-            ctx.SaveChanges();
-        }
-
-        static void ResetPasswordUser(int id, string pass = null)
-        {
-            var ctx = new TareasDbContext();
-            var usuario = ctx.Usuarios.Where(i => i.UsuarioPK == id).FirstOrDefault();
-
-            if (usuario is null)
-            {
-                Console.WriteLine("El usuario no existe");
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(pass))
-                {
-                    usuario.Clave = pass;
-                }
-            }
-            ctx.SaveChanges();
-        }
-
-        static void DeleteUser(int id)
-        {
-            var ctx = new TareasDbContext();
-            var usuario = ctx.Usuarios.Where(i => i.UsuarioPK == id).Single();
-            ctx.Usuarios.Remove(usuario);
-            ctx.SaveChanges();
+            await ctx.SaveChangesAsync();
+            return true;
         }
     }
 }
