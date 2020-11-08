@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorApp1.Data
 {
@@ -9,142 +10,55 @@ namespace BlazorApp1.Data
     {
         // Metodos de Detalle (Detail)
 
-        public List<Detalle> ListDetail()
+        private TareasDbContext ctx;
+
+        public DetalleService(TareasDbContext _context)
         {
-            var ctx = new TareasDbContext();
-            var lista = ctx.Detalles.ToList();
-            return lista;
+            ctx = _context;
         }
 
-        static void SelectDetail(int id)
+        public async Task<List<Detalle>> ListDetail()
         {
-            var ctx = new TareasDbContext();
-            var detalle = ctx.Detalles.Where(i => i.Id == id).FirstOrDefault();
+            return await ctx.Detalles.Include(i => i.Recurso).Include(i => i.Tarea).ToListAsync();
+        }
 
-            if (detalle is null)
+        public async Task<Detalle> SelectDetail(int id)
+        {
+            return await ctx.Detalles.Where(i => i.Id == id).SingleAsync();
+        }
+
+        public async Task<Detalle> SaveDetail(Detalle value)
+        {
+            if (value.Id == 0)
             {
-                Console.WriteLine("El detalle no existe");
+                await ctx.Detalles.AddAsync(value);
             }
             else
             {
-                Console.WriteLine($"Fecha: {detalle.Fecha} ({detalle.Id}) Tiempo: {detalle.Tiempo} " +
-                                    $"Recurso: {detalle.RecursoId} Tarea: {detalle.TareaId}");
+                ctx.Detalles.Update(value);
             }
+            await ctx.SaveChangesAsync();
+            return value;
         }
 
-        static void CreateDetail(int time, int recurso, int tarea)
+        public async Task<bool> DeleteDetail(int id)
         {
-            var ctx = new TareasDbContext();
+            Detalle det = await ctx.Detalles.Where(i => i.Id == id).SingleAsync();
 
-            ctx.Set<Detalle>().Add(new Detalle
-            {
-                Fecha = DateTime.Now,
-                Tiempo = time,
-                RecursoId = recurso,
-                TareaId = tarea
-            });
+            ctx.Detalles.Remove(det);
 
-            ctx.SaveChanges();
+            await ctx.SaveChangesAsync();
+            return true;
         }
 
-        static void UpdateDetailFull(int id, int time, int recId, int taskId)
+        public async Task<List<Recurso>> GetResource()
         {
-            var ctx = new TareasDbContext();
-            var detalle = ctx.Detalles.Where(i => i.Id == id).FirstOrDefault();
-
-            if (detalle is null)
-            {
-                Console.WriteLine("El detalle no existe");
-            }
-            else
-            {
-                detalle.Fecha = DateTime.Now;
-
-                if (time > 0)
-                {
-                    detalle.Tiempo = time;
-                }
-                if (recId > 0)
-                {
-                    detalle.RecursoId = recId;
-                }
-                if (taskId > 0)
-                {
-                    detalle.TareaId = taskId;
-                }
-            }
-            ctx.SaveChanges();
+            return await ctx.Recursos.ToListAsync();
         }
 
-        static void UpdateDetailTime(int id, int time)
+        public async Task<List<Tarea>> GetTask()
         {
-            var ctx = new TareasDbContext();
-            var detalle = ctx.Detalles.Where(i => i.Id == id).FirstOrDefault();
-
-            if (detalle is null)
-            {
-                Console.WriteLine("El detalle no existe");
-            }
-            else
-            {
-                detalle.Fecha = DateTime.Now;
-
-                if (time > 0)
-                {
-                    detalle.Tiempo = time;
-                }
-            }
-            ctx.SaveChanges();
-        }
-
-        static void UpdateDetailResource(int id, int recId)
-        {
-            var ctx = new TareasDbContext();
-            var detalle = ctx.Detalles.Where(i => i.Id == id).FirstOrDefault();
-
-            if (detalle is null)
-            {
-                Console.WriteLine("El detalle no existe");
-            }
-            else
-            {
-                detalle.Fecha = DateTime.Now;
-
-                if (recId > 0)
-                {
-                    detalle.RecursoId = recId;
-                }
-            }
-            ctx.SaveChanges();
-        }
-
-        static void UpdateDetailTask(int id, int taskId)
-        {
-            var ctx = new TareasDbContext();
-            var detalle = ctx.Detalles.Where(i => i.Id == id).FirstOrDefault();
-
-            if (detalle is null)
-            {
-                Console.WriteLine("El detalle no existe");
-            }
-            else
-            {
-                detalle.Fecha = DateTime.Now;
-
-                if (taskId > 0)
-                {
-                    detalle.TareaId = taskId;
-                }
-            }
-            ctx.SaveChanges();
-        }
-
-        static void DeleteDetail(int id)
-        {
-            var ctx = new TareasDbContext();
-            var detalle = ctx.Detalles.Where(i => i.Id == id).Single();
-            ctx.Detalles.Remove(detalle);
-            ctx.SaveChanges();
+            return await ctx.Tareas.ToListAsync();
         }
     }
 }

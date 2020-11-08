@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace BlazorApp1.Data
 {
@@ -9,70 +10,51 @@ namespace BlazorApp1.Data
     {
         // Metodos de Recursos (Resource)
 
-        public List<Recurso> ListResource()
+        private TareasDbContext ctx;
+
+        public RecursoService(TareasDbContext _context)
         {
-            var ctx = new TareasDbContext();
-            var lista = ctx.Recursos.ToList();
-            return lista;
+            ctx = _context;
         }
 
-        static void SelectResource(int id)
+        public async Task<List<Recurso>> ListResource()
         {
-            var ctx = new TareasDbContext();
-            var recurso = ctx.Recursos.Where(i => i.Id == id).FirstOrDefault();
+            return await ctx.Recursos.Include(i=>i.Usuario).ToListAsync();
+        }
 
-            if (recurso is null)
+        public async Task<Recurso> SelectResource(int id)
+        {
+            return await ctx.Recursos.Where(i => i.Id == id).SingleAsync();
+        }
+
+        public async Task<Recurso> SaveResource(Recurso value)
+        {
+            if (value.Id == 0)
             {
-                Console.WriteLine("El recurso no existe");
+                await ctx.Recursos.AddAsync(value);
             }
             else
             {
-                Console.WriteLine($"Nombre: {recurso.Nombre} ({recurso.Id}) Usuario: {recurso.UsuarioId}");
+                ctx.Recursos.Update(value);
             }
+            await ctx.SaveChangesAsync();
+            return value;
         }
 
-        static void CreateResource(string nombre, int usuario)
+        public async Task<bool> DeleteResource(int id)
         {
-            var ctx = new TareasDbContext();
+            Recurso res = await ctx.Recursos.Where(i => i.Id == id).SingleAsync();
 
-            ctx.Set<Recurso>().Add(new Recurso
-            {
-                Nombre = nombre,
-                UsuarioId = usuario
-            });
+            ctx.Recursos.Remove(res);
 
-            ctx.SaveChanges();
+            await ctx.SaveChangesAsync();
+            return true;
         }
 
-        static void UpdateResource(int id, string name, int user = -1)
+        public async Task<List<Usuario>> GetUser()
         {
-            var ctx = new TareasDbContext();
-            var recurso = ctx.Recursos.Where(i => i.Id == id).FirstOrDefault();
-
-            if (recurso is null)
-            {
-                Console.WriteLine("El recurso no existe");
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(name))
-                {
-                    recurso.Nombre = name;
-                }
-                if (user > 0)
-                {
-                    recurso.UsuarioId = user;
-                }
-            }
-            ctx.SaveChanges();
+            return await ctx.Usuarios.ToListAsync();
         }
 
-        static void DeleteResource(int id)
-        {
-            var ctx = new TareasDbContext();
-            var recurso = ctx.Recursos.Where(i => i.Id == id).Single();
-            ctx.Recursos.Remove(recurso);
-            ctx.SaveChanges();
-        }
     }
 }
