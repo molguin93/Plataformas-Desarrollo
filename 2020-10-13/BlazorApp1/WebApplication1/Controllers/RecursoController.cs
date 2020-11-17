@@ -20,10 +20,10 @@ namespace WebApplication1.Controllers
             _context = context;
         }
 
-        //[HttpGet]
-        //public List<Recurso> Get()
-        //{
-        //    return 
-        //}
+        [HttpGet]
+        public List<Recurso> Get()
+        {
+            return _context.Recursos.ToList();
+        }
     }
 }
