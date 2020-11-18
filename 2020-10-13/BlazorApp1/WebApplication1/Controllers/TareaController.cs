@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Data;
 using ClassLibrary1.Entidades;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication1.Controllers
 {
@@ -23,7 +24,7 @@ namespace WebApplication1.Controllers
         [HttpGet]
         public List<Tarea> Get()
         {
-            return _context.Tareas.ToList();
+            return _context.Tareas.Include(i => i.Responsable).ToList();
         }
     }
 }

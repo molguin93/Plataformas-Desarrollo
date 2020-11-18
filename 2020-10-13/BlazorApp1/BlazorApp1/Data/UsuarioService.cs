@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Refit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,9 @@ namespace BlazorApp1.Data
         // Metodos de Usuarios (User)
         public async Task<List<Usuario>> ListUser()
         {
-            return await ctx.Usuarios.ToListAsync();
+            //return await ctx.Usuarios.ToListAsync();
+            var remoteService = RestService.For<IRemoteService>("https://localhost:44373/api/");
+            return await remoteService.GetAllUsuario();
         }
 
         public async Task<Usuario> SelectUser(int id)
