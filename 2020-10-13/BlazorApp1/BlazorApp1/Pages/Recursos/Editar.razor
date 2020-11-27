@@ -1,6 +1,7 @@
 ﻿@page "/Recursos/Editar/{id:int}"
 @using BlazorApp1.Data
 @inject RecursoService RecursoService
+@inject UsuarioService UsuarioService
 @inject NavigationManager navigation
 
 <EditForm Model="@Modelo" OnValidSubmit="@Guardar">
@@ -36,7 +37,7 @@
 
     public string UsuarioId { get; set; }
 
-    private List<Usuario> Usuarios;
+    private List<Usuario> Usuarios = new List<Usuario>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -49,7 +50,7 @@
         {
             Modelo = new Recurso();
         }
-        Usuarios = await RecursoService.GetUser();
+        Usuarios = await UsuarioService.ListUser();
     }
 
 

@@ -22,9 +22,43 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public List<Detalle> Get()
+        public async Task<ActionResult<IEnumerable<Detalle>>> Get()
         {
-            return _context.Detalles.Include(i => i.Recurso).Include(i => i.Tarea).ToList();
+            return await _context.Detalles.Include(i => i.Recurso).Include(i => i.Tarea).AsNoTracking().ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Detalle>> GetDetail(int id)
+        {
+            return await _context.Detalles.Where(i => i.Id == id).AsNoTracking().SingleAsync();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Detalle>> Post(Detalle valor)
+        {
+            if (valor.Id == 0)
+            {
+                await _context.Detalles.AddAsync(valor);
+            }
+            else
+            {
+                _context.Entry(valor).State = EntityState.Modified;
+                //_context.Detalles.Attach(valor);
+                //_context.Detalles.Update(valor);
+            }
+            await _context.SaveChangesAsync();
+            return valor;
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var detail = _context.Detalles.Where(i => i.Id == id).Single();
+
+            _context.Detalles.Remove(detail);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

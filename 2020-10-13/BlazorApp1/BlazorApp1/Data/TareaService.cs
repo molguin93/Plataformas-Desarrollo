@@ -12,12 +12,12 @@ namespace BlazorApp1.Data
 
         // Metodos de Tareas (Task)
 
-        private TareasDbContext ctx;
+        //private TareasDbContext ctx;
 
-        public TareaService(TareasDbContext _context)
-        {
-            ctx = _context;
-        }
+        //public TareaService(TareasDbContext _context)
+        //{
+        //    ctx = _context;
+        //}
 
         public async Task<List<Tarea>> ListTask()
         {
@@ -28,36 +28,38 @@ namespace BlazorApp1.Data
 
         public async Task<Tarea> SelectTask(int id)
         {
-            return await ctx.Tareas.Where(i => i.Id == id).SingleAsync();
+            //return await ctx.Tareas.Where(i => i.Id == id).SingleAsync();
+            var remoteService = RestService.For<IRemoteService>("https://localhost:44373/api/");
+            return await remoteService.GetTarea(id);
         }
 
         public async Task<Tarea> SaveTask(Tarea value)
         {
-            if (value.Id == 0)
-            {
-                await ctx.Tareas.AddAsync(value);
-            }
-            else
-            {
-                ctx.Tareas.Update(value);
-            }
-            await ctx.SaveChangesAsync();
-            return value;
+            //if (value.Id == 0)
+            //{
+            //    await ctx.Tareas.AddAsync(value);
+            //}
+            //else
+            //{
+            //    ctx.Tareas.Update(value);
+            //}
+            //await ctx.SaveChangesAsync();
+            //return value;
+            var remoteService = RestService.For<IRemoteService>("https://localhost:44373/api/");
+            return await remoteService.GuardarTarea(value);
         }
 
         public async Task<bool> DeleteTask(int id)
         {
-            Tarea task = await ctx.Tareas.Where(i => i.Id == id).SingleAsync();
+            //Tarea task = await ctx.Tareas.Where(i => i.Id == id).SingleAsync();
 
-            ctx.Tareas.Remove(task);
+            //ctx.Tareas.Remove(task);
 
-            await ctx.SaveChangesAsync();
+            //await ctx.SaveChangesAsync();
+            //return true;
+            var remoteService = RestService.For<IRemoteService>("https://localhost:44373/api/");
+            await remoteService.BorrarTarea(id);
             return true;
-        }
-
-        public async Task<List<Recurso>> GetResource()
-        {
-            return await ctx.Recursos.ToListAsync();
         }
 
     }

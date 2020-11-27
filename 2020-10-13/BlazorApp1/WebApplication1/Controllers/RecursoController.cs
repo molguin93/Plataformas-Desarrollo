@@ -22,9 +22,42 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public List<Recurso> Get()
+        public async Task<ActionResult<IEnumerable<Recurso>>> Get()
         {
-            return _context.Recursos.Include(i => i.Usuario).ToList();
+            return await _context.Recursos.Include(i => i.Usuario).AsNoTracking().ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Recurso>> GetResource(int id)
+        {
+            return await _context.Recursos.Where(i => i.Id == id).AsNoTracking().SingleAsync();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Recurso>> Post(Recurso valor)
+        {
+            if (valor.Id == 0)
+            {
+                await _context.Recursos.AddAsync(valor);
+            }
+            else
+            {
+                _context.Entry(valor).State = EntityState.Modified;
+                //_context.Recursos.Attach(valor);
+                //_context.Recursos.Update(valor);
+            }
+            await _context.SaveChangesAsync();
+            return valor;
+        }
+
+        public async Task<IActionResult> Delete(int id)
+        {
+            var resource = await _context.Recursos.Where(i => i.Id == id).SingleAsync();
+
+            _context.Recursos.Remove(resource);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

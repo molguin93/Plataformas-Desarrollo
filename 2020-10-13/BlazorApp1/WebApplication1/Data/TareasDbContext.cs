@@ -56,6 +56,11 @@ namespace WebApplication1.Data
             });
         }
 
+        internal object AsNoTracking()
+        {
+            throw new NotImplementedException();
+        }
+
         public DbSet<Usuario> Usuarios { get; set; }
         public DbSet<Recurso> Recursos { get; set; }
         public DbSet<Tarea> Tareas { get; set; }

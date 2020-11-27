@@ -22,9 +22,51 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public List<Tarea> Get()
+        public async Task<ActionResult<IEnumerable<Tarea>>> Get()
         {
-            return _context.Tareas.Include(i => i.Responsable).ToList();
+            return await _context.Tareas.Include(i => i.Responsable).AsNoTracking().ToListAsync();
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Tarea>> GetTask(int id)
+        {
+            return await _context.Tareas.Where(i => i.Id == id).AsNoTracking().SingleAsync();
+        }
+
+        //[HttpPut("/{id}")]
+        //public async Task<Tarea> Put(Tarea valor)
+        //{
+        //    _context.Entry(valor).State = EntityState.Modified;
+        //    await _context.SaveChangesAsync();
+        //    return valor;
+        //}
+
+        [HttpPost]
+        public async Task<ActionResult<Tarea>> Post(Tarea valor)
+        {
+            if (valor.Id == 0)
+            {
+                await _context.Tareas.AddAsync(valor);
+            }
+            else
+            {
+                _context.Entry(valor).State = EntityState.Modified;
+                //_context.Tareas.Attach(valor);
+                //_context.Tareas.Update(valor);
+            }
+            await _context.SaveChangesAsync();
+            return valor;
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var task = _context.Tareas.Where(i => i.Id == id).Single();
+
+            _context.Tareas.Remove(task);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
     }
 }

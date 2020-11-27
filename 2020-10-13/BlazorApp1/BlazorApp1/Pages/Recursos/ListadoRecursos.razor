@@ -28,16 +28,16 @@ else
         <tbody>
             @foreach (var resource in recursos)
             {
-            <tr>
-                <td>@resource.Id</td>
-                <td>@resource.Nombre</td>
-                <td>@resource.Usuario.Nombre</td>
-                <td>
-                    <button class="btn btn-info" @onclick="()=>Editar(resource.Id)">
-                        Editar
-                    </button> <button class="btn btn-danger" @onclick="()=>Borrar(resource.Id)">Borrar</button>
-                </td>
-            </tr>
+                <tr>
+                    <td>@resource.Id</td>
+                    <td>@resource.Nombre</td>
+                    <td>@resource.Usuario.Nombre</td>
+                    <td>
+                        <button class="btn btn-info" @onclick="()=>Editar(resource.Id)">
+                            Editar
+                        </button> <button class="btn btn-danger" @onclick="()=>Borrar(resource.Id)">Borrar</button>
+                    </td>
+                </tr>
             }
         </tbody>
     </table>
