@@ -36,6 +36,13 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<ActionResult<Recurso>> Post(Recurso valor)
         {
+            var local = _context.Recursos.Local.FirstOrDefault(i => i.Id.Equals(valor.Id));
+
+            if (local != null)
+            {
+                _context.Entry(local).State = EntityState.Detached;
+            }
+
             if (valor.Id == 0)
             {
                 await _context.Recursos.AddAsync(valor);
@@ -43,11 +50,9 @@ namespace WebApplication1.Controllers
             else
             {
                 _context.Entry(valor).State = EntityState.Modified;
-                //_context.Recursos.Attach(valor);
-                //_context.Recursos.Update(valor);
             }
             await _context.SaveChangesAsync();
-            return valor;
+            return Ok();
         }
 
         public async Task<IActionResult> Delete(int id)

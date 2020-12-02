@@ -33,17 +33,16 @@ namespace WebApplication1.Controllers
             return await _context.Tareas.Where(i => i.Id == id).AsNoTracking().SingleAsync();
         }
 
-        //[HttpPut("/{id}")]
-        //public async Task<Tarea> Put(Tarea valor)
-        //{
-        //    _context.Entry(valor).State = EntityState.Modified;
-        //    await _context.SaveChangesAsync();
-        //    return valor;
-        //}
-
         [HttpPost]
         public async Task<ActionResult<Tarea>> Post(Tarea valor)
         {
+            var local = _context.Tareas.Local.FirstOrDefault(i => i.Id.Equals(valor.Id));
+
+            if (local != null)
+            {
+                _context.Entry(local).State = EntityState.Detached;
+            }
+
             if (valor.Id == 0)
             {
                 await _context.Tareas.AddAsync(valor);
@@ -51,11 +50,9 @@ namespace WebApplication1.Controllers
             else
             {
                 _context.Entry(valor).State = EntityState.Modified;
-                //_context.Tareas.Attach(valor);
-                //_context.Tareas.Update(valor);
             }
             await _context.SaveChangesAsync();
-            return valor;
+            return Ok();
         }
 
         [HttpDelete("{id}")]

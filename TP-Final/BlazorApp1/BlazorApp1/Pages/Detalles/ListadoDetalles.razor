@@ -61,7 +61,7 @@ else
 
     async Task Borrar(int id)
     {
-        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Desea elimiar la Detalle?");
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Desea elimiar el Detalle?");
         if (confirmed)
         {
             await DetalleService.DeleteDetail(id);

@@ -28,9 +28,6 @@ namespace BlazorApp1.Data
         [Get("/Usuario/{id}")]
         Task<Usuario> GetUsuario(int id);
 
-        //[Put("/Usuario/{id}")]
-        //Task<Usuario> GuardarUsuario2(int id, Usuario user);
-
         [Post("/Usuario")]
         Task<Usuario> GuardarUsuario(Usuario valor);
 

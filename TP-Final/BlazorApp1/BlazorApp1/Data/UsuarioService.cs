@@ -41,11 +41,5 @@ namespace BlazorApp1.Data
             await remoteService.BorrarUsuario(id);
             return true;
         }
-
-        //public async Task<Usuario> SaveUser2(int id, Usuario value)
-        //{
-        //    var remoteService = RestService.For<IRemoteService>("https://localhost:44373/api/");
-        //    return await remoteService.GuardarUsuario2(id, value);
-        //}
     }
 }

@@ -36,7 +36,12 @@ namespace WebApplication1.Controllers
         [HttpPost]
         public async Task<ActionResult<Usuario>> Post(Usuario valor)
         {
-            //_context.Entry(valor).State = valor.UsuarioPK == 0 ? EntityState.Added : EntityState.Modified;
+            var local = _context.Usuarios.Local.FirstOrDefault(i => i.UsuarioPK.Equals(valor.UsuarioPK));
+
+            if (local != null)
+            {
+                _context.Entry(local).State = EntityState.Detached;
+            }
 
             if (valor.UsuarioPK == 0)
             {
@@ -44,10 +49,7 @@ namespace WebApplication1.Controllers
             }
             else
             {
-                _context.Entry(valor).State = EntityState.Unchanged;
                 _context.Entry(valor).State = EntityState.Modified;
-                //_context.Usuarios.Attach(valor);
-                //_context.Usuarios.Update(valor);
             }
                 await _context.SaveChangesAsync();
             return Ok();
@@ -63,39 +65,5 @@ namespace WebApplication1.Controllers
 
             return NoContent();
         }
-
-        //[HttpPut("{id}")]
-        //public async Task<IActionResult> Put(int id, Usuario user)
-        //{
-        //    if (id != user.UsuarioPK)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    _context.Entry(user).State = EntityState.Modified;
-
-        //    try
-        //    {
-        //        await _context.SaveChangesAsync();
-        //    }
-        //    catch (DbUpdateConcurrencyException)
-        //    {
-        //        if (!UserExists(id))
-        //        {
-        //            return NotFound();
-        //        }
-        //        else
-        //        {
-        //            throw;
-        //        }
-        //    }
-
-        //    return NoContent();
-        //}
-
-        //private bool UserExists(int id)
-        //{
-        //    throw new NotImplementedException();
-        //}
     }
 }

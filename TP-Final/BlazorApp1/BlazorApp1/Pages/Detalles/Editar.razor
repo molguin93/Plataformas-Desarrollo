@@ -32,7 +32,7 @@
             <div class="mb-3">
                 Tarea:
                 <InputSelect class="p-1" @bind-Value="TareaId">
-                    <option value="0">Elija un Recurso</option>
+                    <option value="0">Elija una Tarea</option>
                     @foreach (var item in Tareas)
                     {
                         <option value="@item.Id">@item.Titulo</option>

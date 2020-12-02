@@ -1,7 +1,9 @@
 ﻿@page "/Tareas/Editar/{id:int}"
 @using BlazorApp1.Data
+@inject IJSRuntime JsRuntime
 @inject TareaService TareaService
 @inject RecursoService RecursoService
+@inject DetalleService DetalleService
 @inject NavigationManager navigation
 
 <EditForm Model="@Modelo" OnValidSubmit="@Guardar">
@@ -36,6 +38,35 @@
                 Estado:
                 <InputText @bind-Value="Modelo.Estado" />
             </div>
+            <div>
+                <h4 class="mb-2 mt-5">Detalles</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Tiempo</th>
+                            <th>Recurso</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detail in Detalles)
+                        {
+                            if (detail.TareaId == Modelo.Id)
+                            {
+                                <tr>
+                                    <td>@detail.Fecha</td>
+                                    <td>@detail.Tiempo</td>
+                                    <td>@detail.Recurso.Nombre</td>
+                                    <td>
+                                        <button class="btn btn-danger" @onclick="()=>BorrarDetail(detail.Id)">Borrar</button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
             <button class="btn btn-primary my-3" type="submit">Guardar</button>
         </div>
     </div>
@@ -52,6 +83,7 @@
     public string RecursoId { get; set; }
 
     private List<Recurso> Recursos = new List<Recurso>();
+    private List<Detalle> Detalles = new List<Detalle>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -64,10 +96,19 @@
         {
             Modelo = new Tarea();
         }
+        Detalles = await DetalleService.ListDetail();
         Recursos = await RecursoService.ListResource();
-        
     }
 
+    async Task BorrarDetail(int id)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", "Desea elimiar el Detalle?");
+        if (confirmed)
+        {
+            await DetalleService.DeleteDetail(id);
+            Detalles = await DetalleService.ListDetail();
+        }
+    }
 
     private async void Guardar()
     {
